@@ -2,11 +2,12 @@ import os
 import sys
 from . import logs
 from .shells import shell
-from .conf import settings, load_source
+from .conf import settings
 from .const import DEFAULT_PRIORITY, ALL_ENABLED
 from .exceptions import EmptyCommand
 from .utils import get_alias, format_raw_script
 from .output_readers import get_output
+import importlib.machinery
 
 
 class Command(object):
@@ -140,7 +141,7 @@ class Rule(object):
             return
         with logs.debug_time(u'Importing rule: {};'.format(name)):
             try:
-                rule_module = load_source(name, str(path))
+                rule_module = importlib.machinery.SourceFileLoader(name, str(path)).load_module()
             except Exception:
                 logs.exception(u"Rule {} failed to load".format(name), sys.exc_info())
                 return
